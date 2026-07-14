@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.venv/
+env/
+rag/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
+# Database (if you don't want to commit it)
+*.db
+
+# ChromaDB
+chroma_db/
+
+# Uploaded files
+uploads/
+
+# Build files
+dist/
+build/
+*.egg-info/
+
+# SQLite database
+app.db
+*.db
