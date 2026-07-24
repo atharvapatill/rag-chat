@@ -13,7 +13,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
 def hash_password(password: str):
-    print("Hashed Passowrd :",pwd_context.hash(password))
     return pwd_context.hash(password)
 
 

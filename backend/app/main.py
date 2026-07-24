@@ -1,31 +1,32 @@
 import os
-from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from fastapi import FastAPI,Depends
-from sqlalchemy import inspect
-from app.database.db import engine,get_db
+load_dotenv()  # Must be called before any app imports so env vars are available at module load time
 
-from app.database.models import File, User
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.database.db import engine
+
+from app.database.models import File, User, Base
+
 from app.routes.auth import router as auth_router
 from app.routes.files import router as file_router
 from app.routes.chat import router as chat_router
 
-from app.database.models import Base
-
-load_dotenv()  # loads .env automatically
-
 app = FastAPI()
 
-frontend_url = os.getenv("FRONTEND_URL")
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+# Build allowed origins list — always include localhost fallback
+allow_origins = list({frontend_url, "http://localhost:3000", "http://127.0.0.1:3000"})
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url],
+    allow_origins=allow_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    expose_headers=["Set-Cookie"],
 )
 
 Base.metadata.create_all(bind=engine)
@@ -37,28 +38,3 @@ app.include_router(chat_router)
 @app.get("/")
 def root():
     return {"message": "RAG API is running"}
-
-
-@app.get("/test-db")
-def test_db(db: Session = Depends(get_db)):
-    return {"message": "Database connected"}
-
-
-@app.get("/columns")
-def get_columns():
-    inspector = inspect(engine)
-
-    return {
-        "users": [col["name"] for col in inspector.get_columns("users")],
-        "files": [col["name"] for col in inspector.get_columns("files")]
-    }
-
-@app.get("/getUserData")
-def getUserData(db: Session = Depends(get_db)):
-    users = db.query(User).all()
-    return users
-
-@app.get("/getFilesData")
-def getUserData(db: Session = Depends(get_db)):
-    users = db.query(File).all()
-    return users

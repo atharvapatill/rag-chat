@@ -1,4 +1,5 @@
 import os
+import traceback
 import uuid
 
 from fastapi import HTTPException, UploadFile
@@ -96,11 +97,14 @@ def process_pdf(
             "chunks": len(chunks)
         }
 
-    except Exception:
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback.print_exc()
         db.rollback()
         raise HTTPException(
             status_code=500,
-            detail="Failed to process PDF"
+            detail=f"Failed to process PDF: {str(e)}"
         )
 
     finally:

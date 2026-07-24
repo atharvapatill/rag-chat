@@ -66,14 +66,14 @@ def delete_file(
 # ----------------------------
 # Get All User Files
 # ----------------------------
-@router.get("/files")
+@router.get("/")
 def list_files(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     files = db.query(File).filter(
         File.user_id == current_user.user_id
-    ).all()
+    ).order_by(File.uploaded_at.desc()).all()
 
     return [
         {
